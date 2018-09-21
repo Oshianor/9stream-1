@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "624516396075",
+    "firebase_url": "https://stream-2eeac.firebaseio.com",
+    "project_id": "stream-2eeac",
+    "storage_bucket": "stream-2eeac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624516396075:android:47f551e9e6c5c47f",
+        "android_client_info": {
+          "package_name": "com.ninestream"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "624516396075-ifngjq6gmtvmc4rjop1usuoo9r1ebukj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnzkc-qX_cj4TAHSPMmhvpdcKUpuaz_s0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
