@@ -15,7 +15,8 @@ import KeepAwake from 'react-native-keep-awake'
 import Orientation from 'react-native-orientation'
 import Icons from 'react-native-vector-icons/MaterialIcons'
 import { Controls } from './'
-import { checkSource } from './utils'
+import { checkSource } from './utils';
+import { Button } from 'react-native-paper'; 
 const Win = Dimensions.get('window')
 const backgroundColor = '#000'
 
@@ -315,7 +316,10 @@ class Video extends Component {
       <Animated.View
         style={[styles.background, fullScreen ? styles.fullScreen : inline]}
       >
-        <Text style={textStyle}>Retry</Text>
+        {/* <Text style={textStyle}>Retry</Text> */}
+        <Button mode="contained" onPress={() => this.setState({
+          paused: true
+        })} >Retry</Button>
         <Icons
           name="replay"
           size={60}

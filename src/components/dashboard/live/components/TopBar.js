@@ -69,8 +69,8 @@ const TopBar = (props) => {
             size={25}
           /> */}
           
-          <Text style={{ color: 'red' }} >
-          <Text style={{ fontSize: 60 }} >.</Text>
+          <Text style={{ marginTop: -30, marginLeft: 40 }} >
+            <Text style={{ fontSize: 60, color: 'red' }} >.</Text>
             Live
           </Text>
         {/* } */}
