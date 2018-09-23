@@ -12,3 +12,40 @@ export const passCurrentComentReplyObjectData = (obj) => {
     payload: obj
   }
 }
+
+export const getcomment = (obj) => {
+  return {
+    type: "GET_COMMENT",
+    payload: obj
+  }
+}
+
+export const getReply = (obj) => {
+  return {
+    type: "GET_REPLY",
+    payload: obj
+  }
+}
+
+
+export const commenttext = (obj) => {
+  return {
+    type: "COMMENT_TEXT",
+    payload: obj
+  }
+}
+
+export const replytext = (obj) => {
+  return {
+    type: "REPLY_TEXT",
+    payload: obj
+  }
+}
+
+
+
+export const votingtoggle = () => {
+  return {
+    type: "VOTING_TOGGLE",
+  }
+}

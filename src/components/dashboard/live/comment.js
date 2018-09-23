@@ -1,26 +1,47 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, FlatList, Platform, RefreshControl } from 'react-native';
 import gone from '../../../assets/aqua.jpg';
-import { Spinner, Fab, Icon, Button, Thumbnail, Header, Body, Right, Left } from "native-base";
-import Userfullname from '../../reuse/userfullname';
-import { setCurrentCommentId, passCurrentComentReplyObjectData } from "../../../store/actions/community";
+import { Icon, Button, Thumbnail, Container, Spinner } from "native-base";
+import { 
+  setCurrentCommentId, 
+  passCurrentComentReplyObjectData,
+  getcomment
+} from "../../../store/actions/community";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
+import firebase from 'react-native-firebase';
 
 class Comment extends Component {
+  componentDidMount = () => {
+    this._onRefresh();
+  }
 
+  _onRefresh = () => {
+    let empty = []
+    let database = firebase.database();
+    let commentRef = database.ref('comments').orderByChild('created');
+    commentRef.on('child_added', snapshot => {
+      empty = empty.concat(snapshot.val())
+      this.props.getcomment(empty);
+    })
+  }
 
   handleCommentReply(item){
     this.props.setCurrentCommentId(item.id);
     this.props.passCurrentComentReplyObjectData(item);
   }
 
-  render() {
-    const item = this.props.item;
+  displayComment = (item) => {
     return (
       <View style={styles.tweetReply} >
-        <Thumbnail small source={gone} />
+      {
+        typeof item.img !== "null" ?
+          <Thumbnail small source={item.img} />
+        :
+        
+      }
+        
         <View
           style={{
             justifyContent: "flex-start",
@@ -31,11 +52,11 @@ class Comment extends Component {
           }}
         >
           <View style={{ flexDirection: "row", maxHeight: 22 }}>
-            <Userfullname type="fullName" style={{ fontWeight: "bold" }} userId={item.user_id} />
+            <Text style={{ fontWeight: "bold" }} >{item.name}</Text>
             <Text
-              style={{ color: "#888", flex: 1, textAlign: 'right' }}
+              style={{ color: "gray", flex: 1, textAlign: 'right' }}
             >
-              {item.created_at.toString()}
+              {item.created.toString()}
             </Text>
           </View>
           <View
@@ -44,8 +65,8 @@ class Comment extends Component {
               paddingTop: 5
             }}
           >
-            <Text style={{ color: "black", flex: 1 }}>
-              {item.content}
+            <Text style={{ color: "gray", flex: 1 }}>
+              {item.text}
             </Text>
           </View>
           <View
@@ -68,7 +89,7 @@ class Comment extends Component {
               <Button
                 transparent
                 dark
-                onPress={this.handleCommentReply.bind(this, item)}
+                onPress={this.handleCommentReply.bind(this)}
               >
                 <Icon
                   name="ios-text-outline"
@@ -77,13 +98,76 @@ class Comment extends Component {
                 <Text style={{ fontSize: 14 }}>12</Text>
               </Button>
             </View>
+            {
+              this.props.user.user.id === item.userId &&
+                <View>
+                  <View style={styles.footerIcons}>
+                    <Button
+                      transparent
+                      dark
+                      onPress={this.handleCommentReply.bind(this)}
+                    >
+                      <Icon
+                        name="ios-create"
+                        style={{ fontSize: 20 }}
+                      />
+                    </Button>
+                  </View>
 
+                  <View style={styles.footerIcons}>
+                    <Button
+                      transparent
+                      dark
+                      onPress={this.handleCommentReply.bind(this)}
+                    >
+                      <Icon
+                        name="ios-close"
+                        style={{ fontSize: 20 }}
+                      />
+                    </Button>
+                  </View>
+                </View>
+            }
           </View>
         </View>
       </View>
     );
   }
+
+  render() {
+    return (
+      <Container  style={{ flex: 1 }} >
+        {this.props.community.loading ? (
+          <View
+            contentContainerStyle={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <Spinner color="white" />
+          </View>
+        ) : (
+          <FlatList
+            data={this.props.community.comment}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.props.community.refresh}
+                onRefresh={this._onRefresh}
+                progressBackgroundColor="black"
+                enabled={true}
+                colors={['white']}
+              />
+            }
+            keyExtractor={(item, index) => item + index}
+            renderItem={({ item }) => this.displayComment(item)}
+          />
+        )}
+      </Container>
+    )
+  }
 }
+
 const Comments = withNavigation(Comment);
 
 function mapStateToProps(state) {
@@ -97,6 +181,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     setCurrentCommentId: setCurrentCommentId,
+    getcomment: getcomment,
     passCurrentComentReplyObjectData: passCurrentComentReplyObjectData
   }, dispatch)
 }
@@ -104,26 +189,7 @@ function mapDispatchToProps(dispatch) {
 export default connect(mapStateToProps, mapDispatchToProps)(Comments);
 
 const styles = StyleSheet.create({
-  elev: {
-    backgroundColor: 'orange',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
-      },
-      android: {
-        elevation: 10,
-      },
-    }),
-  },
-  container: {
-    flex: 1,
-  },
-  commentInput: {
-    // height: 200
-  },
+
   input: {
     flex: 1,
     width: '100%',

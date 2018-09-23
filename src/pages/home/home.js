@@ -39,7 +39,7 @@ class Home extends Component {
       await AsyncStorage.setItem(key, JSON.stringify(item));
       // return jsonOfItem;
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   }
 
@@ -56,8 +56,8 @@ class Home extends Component {
     try {
       const value = await AsyncStorage.getItem('user');
       const userRaw = await AsyncStorage.getItem('user_raw');
-      console.log("LITTY", JSON.parse(value));
-      console.log("raw", JSON.parse(userRaw));
+      // console.log("LITTY", JSON.parse(value));
+      // console.log("raw", JSON.parse(userRaw));
       this.setState({
         user: JSON.parse(value) === null ,
         userRaw: JSON.parse(userRaw)
@@ -70,7 +70,7 @@ class Home extends Component {
           // get app version
           this.props.getUserObject(JSON.parse(value) !== null ? JSON.parse(value): {})
           Get('/mobile_config/get_app_version').then(res => {
-            console.log('MOBILE', res);
+            // console.log('MOBILE', res);
             
             if (!res.error) {
               if (res.content.app_version_required === "1.0.0") {

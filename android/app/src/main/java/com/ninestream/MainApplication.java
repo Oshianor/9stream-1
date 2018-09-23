@@ -14,6 +14,7 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
 import com.brentvatne.react.ReactVideoPackage;
 import io.invertase.firebase.RNFirebasePackage;
+import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -44,6 +45,7 @@ public class MainApplication extends Application implements ReactApplication {
           new OrientationPackage(),
           new VectorIconsPackage(),
           new KCKeepAwakePackage(),
+          new RNFirebaseDatabasePackage(),
           new ReactVideoPackage()
       );
     }

@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, Dimensions, RefreshControl, TouchableOpacity, FlatList } from 'react-native';
-import { Spinner, Header, Body } from "native-base";
-import Video, { Container } from 'react-native-af-video-player';
+import { View, StyleSheet, Text, ImageBackground, NetInfo, TouchableOpacity, FlatList } from 'react-native';
+import { Spinner } from "native-base";
+import { Container } from 'react-native-af-video-player';
+import Video from "../../../components/dashboard/live/components/Video";
 import { setCurrentCommentId, passCurrentComentReplyObjectData } from "../../../store/actions/community";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button } from 'react-native-paper';
+import { Button, Snackbar } from 'react-native-paper';
 import { Get } from '../../../components/reuse/get';
 import { Post } from "../../../components/reuse/post";
+import { Icon } from 'native-base';
+import Comment from '../../../components/dashboard/live/comment';
+import WriteComment from '../../../components/dashboard/live/writecomment';
 
 class LiveShow extends Component {
   static navigationOptions = ({ navigation }) => {
@@ -30,15 +34,35 @@ class LiveShow extends Component {
 
     this.state = {
       text: '',
-      video: {},
+      video: null,
       height: 0,
       loading: true,
-      refreshing: false,
       vid: null,
-      img: null
+      img: null,
+      icon: "play",
+      isConnected: true
     }
   }
-  
+
+  async storeItem(key, item) {
+    try {
+      //we want to wait for the Promise returned by AsyncStorage.setItem()
+      //to be resolved to the actual value before returning the value
+      await AsyncStorage.setItem(key, JSON.stringify(item));
+      // return jsonOfItem;
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  handleConnectivityChange = isConnected => {
+    if (isConnected) {
+      this.setState({ isConnected, text: "No Internet Connection", visible: true });
+    } else {
+      this.setState({ isConnected });
+    }
+  };
+
   // make avideo fullscreen
   onFullScreen(status) {
     // Set the params to pass in fullscreen status to navigationOptions
@@ -47,45 +71,115 @@ class LiveShow extends Component {
     })
   }
 
-  componentDidMount(){
+  // loading up the live show content
+  onLoad = async (profile) => {
+    try {
+      const live = await AsyncStorage.getItem('live');
+      if (typeof JSON.parse(live) !== 'null') {
+
+        this.setState({
+          video: JSON.parse(live),
+          loading: false
+        })
+      }
+    } catch (error) {
+      this.setState({
+        text: "Something Went Wrong",
+        visible: true,
+      })
+    }
+  }
+
+  initialLoad = () => {
+    this.setState({
+      loading: true
+    })
     let obj = {
       token: this.props.user.user.token
     }
-    Get("/live/list_channels").then(res => {
-      if(!res.error) {
-        Post("/user/get_self_id", obj).then(resp => {
-          if (!resp.error) {
-            if (resp.subscriptionPlan !== null) {
+    // we get the user details
+    Post("/user/get_self_id", obj).then(resp => {
+      // check if there wer errors
+      console.log("get by user id", typeof resp.content.profile.subscriptionPlan !== "null");
+      
+      if (!resp.error) {
+        // check if the user is subscribed
+        if (typeof resp.content.profile.subscriptionPlan !== "null") {
+          // if the user is subcribed then we get the live stream
+          Get("/live/list_channels").then(res => {
+            // cehck if there wer errors
+            if (!res.error) {
+              // no errors
+              res.content.entries[0].media.content.forEach(live => {
+                if (typeof live.HLSStream !== "undefined") {
+                  // get the video url of the stream 
+                  this.setState({
+                    vid: live.HLSStream 
+                  })
+                }
+                if (typeof live.ChannelLogoSmartphones !== "undefined") {
+                  // get thye image url 
+                  this.setState({
+                    img: live.ChannelLogoSmartphones 
+                  })
+                }
+              })
               this.setState({
                 video: res.content.entries[0],
-                
+                loading: false
+              })
+            } else {
+              // if there was an error in getting the channels
+              this.setState({
+                loading: false,
+                icon: "refresh"
               })
             }
-          }
+          })
+        } else {
+          // if there was an error in getting the channels
+          this.setState({
+            text: "Subscribe to get access to the swap show",
+            visible: true,
+            loading: false,
+            icon: "play"
+          })
+        }
+      } else {
+        this.setState({
+          text: "Something Went Wrong",
+          visible: true,
+          loading: false
         })
       }
     })
   }
 
-  render() {
-    const theme = {
-      title: '#FFF',
-      more: '#446984',
-      center: '#7B8F99',
-      fullscreen: '#446984',
-      volume: '#A5957B',
-      scrubberThumb: '#234458',
-      scrubberBar: '#DBD5C7',
-      seconds: '#DBD5C7',
-      duration: '#DBD5C7',
-      progress: '#446984',
-      loading: '#DBD5C7'
-    }
+  componentDidMount() {
+    NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
+    this.initialLoad(); 
+  }
 
-    return (
-      <View style={styles.container}>
-        {
-          this.state.loading ?
+render() {
+  const theme = {
+    title: '#FFF',
+    more: '#446984',
+    center: '#7B8F99',
+    fullscreen: '#446984',
+    volume: '#A5957B',
+    scrubberThumb: '#234458',
+    scrubberBar: '#DBD5C7',
+    seconds: '#DBD5C7',
+    duration: '#DBD5C7',
+    progress: '#446984',
+    loading: '#DBD5C7'
+  }
+  console.log(this.state);
+
+  return (
+    <View style={styles.container}>
+      {
+        this.state.loading ?
           <View
             contentContainerStyle={{
               flex: 1,
@@ -97,27 +191,64 @@ class LiveShow extends Component {
           </View>
           :
           <Container>
-            <Video
-              autoPlay
-              ref={(ref) => { this.video = ref }}
-              title={this.props.navigation.state.params.item.title}
-              url={this.state.vid}
-              logo={this.state.img}
-              placeholder={this.state.img}
-              theme={theme}
-              // onMorePress={() => this.onMorePress()}
-              onFullScreen={status => this.onFullScreen(status)}
-              fullScreenOnly
-              rotateToFullScreen
-            />
-            <View style={{ flex: 1 }} >
-
-            </View>
-          </Container>
-        }
+            {
+              this.state.video == null ?
+              <TouchableOpacity onPress={this.initialLoad} >
+                <ImageBackground
+                  source={{ uri: this.state.img }}
+                  style={{ height: 250, justifyContent: 'center', alignItems: 'center' }}
+                >
+                  <Icon
+                    name={"ios-" + this.state.icon}
+                    style={{
+                      fontSize: 70, justifyContent: 'center',
+                      color: 'gray'
+                    }}
+                  />
+                </ImageBackground>
+              </TouchableOpacity>
+                
+              :
+              <Video
+                autoPlay
+                ref={(ref) => { this.video = ref }}
+                title={this.state.video.title}
+                url={this.state.vid}
+                logo={this.state.img}
+                // placeholder={this.state.img}
+                theme={theme}
+                onFullScreen={status => this.onFullScreen(status)}
+                rotateToFullScreen
+              />
+            }
+        </Container>
+      }
+      <View style={{ flex: 1, marginVertical: 20, backgroundColor: "white" }} >
+        <Comment />
       </View>
-    )
-  }
+      <WriteComment />
+      {
+        this.props.community.votingToggle &&
+        <Button mode="contained" 
+          style={{ borderRadius: 0, position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: "red" }}  >
+          VOTE
+        </Button>
+      }
+      
+      <Snackbar
+        visible={this.state.visible}
+        duration={9000000}
+        onDismiss={() => this.setState({ visible: false })}
+        action={{
+          label: 'Hide',
+          onPress: () => { this.setState({ visible: false }) },
+        }}
+      >
+        {this.state.text}
+      </Snackbar>
+    </View>
+  )
+}
 }
 
 
@@ -142,52 +273,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(LiveShow);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black'
+    // backgroundColor: 'black'
   },
 });
-
-
-
-
-
-// import React, { Component } from 'react';
-// import Video from "../../../components/dashboard/live/components/Video";
-// import swap from "../../../assets/9stream.png"
-
-// export default class Liveshow extends Component {
-//   // static navigationOptions = {
-//   //   header: null
-//   // }
-
-//   static navigationOptions = ({ navigation }) => {
-//     const { state } = navigation
-//     // Setup the header and tabBarVisible status
-//     // const header = state.params && (state.params.fullscreen ? undefined : null)
-//     const tabBarVisible = state.params ? state.params.fullscreen : true
-//     // const header = state.params && (state.params.text ? undefined : null)
-//     // const tabBarVisible = state.params ? state.params.text : false
-//     return {
-//       // For stack navigators, you can hide the header bar like so
-//       header: null,
-//       // For the tab navigators, you can hide the tab bar like so
-//       tabBarVisible: false,
-//     }
-//   }
-  
-//   render() {
-//     return (
-//       <Video
-//         title="more"
-//         placeholder={
-//           "https://img.grepmed.com/uploads/1936/interpretation-endtidalco2-capnography-waveforms-diagnosis-original.jpeg"
-//         }
-//         logo={
-//           "https://img.grepmed.com/uploads/1936/interpretation-endtidalco2-capnography-waveforms-diagnosis-original.jpeg"
-//         }
-//         ref={(ref) => { this.video = ref }}
-//         url={"https://uvodscp-lh.akamaihd.net/i/rjrretvdirect_1@506691/master.m3u8"}
-//         rotateToFullScreen
-//       />
-//     )
-//   }
-// }
