@@ -125,7 +125,7 @@ class Vod extends Component {
     if (this.state.noContent) {
       return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: "center", backgroundColor: '#242424' }} >
-          <Button mode="contained" disabled  >
+          <Button mode="contained" disabled >
             <Text style={{ color: "#f48221" }}> Currently No Content</Text>
           </Button>
         </View>

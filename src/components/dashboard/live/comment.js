@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, FlatList, Platform, RefreshControl } from 'react-native';
-import gone from '../../../assets/aqua.jpg';
+import { IconButton } from 'react-native-paper';
 import { Icon, Button, Thumbnail, Container, Spinner } from "native-base";
 import { 
   setCurrentCommentId, 
@@ -11,6 +11,10 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
 import firebase from 'react-native-firebase';
+import UserAvatar from 'react-native-user-avatar';
+import { TouchableRipple } from 'react-native-paper';
+import DialogAndroid from 'react-native-dialogs';
+
 
 class Comment extends Component {
   componentDidMount = () => {
@@ -22,7 +26,8 @@ class Comment extends Component {
     let database = firebase.database();
     let commentRef = database.ref('comments').orderByChild('created');
     commentRef.on('child_added', snapshot => {
-      empty = empty.concat(snapshot.val())
+      // empty = empty.concat(snapshot.val()).reverse();
+      empty.unshift(snapshot.val());
       this.props.getcomment(empty);
     })
   }
@@ -32,16 +37,46 @@ class Comment extends Component {
     this.props.passCurrentComentReplyObjectData(item);
   }
 
+  deleter(pas){
+    let database = firebase.database();
+    database.ref("comments").child(pas).remove()
+  }
+
+  async handleDelete(itemKey){
+    let database = firebase.database();
+    const { action } = await DialogAndroid.alert('Delete Comment', 
+    'Are You sure you want to perform this action?',
+    {
+      cancelable: true,
+      negativeColor: "red",
+      negativeText: "No",
+      positiveColor: "black",
+      positiveText: "Yes"
+    }
+  );
+    switch (action) {
+      case DialogAndroid.actionPositive:
+        database.ref("comments").child(itemKey).remove()
+        break;
+      case DialogAndroid.actionNegative:
+        console.log('negative!')
+        break;
+    }
+  }
+
   displayComment = (item) => {
     return (
       <View style={styles.tweetReply} >
       {
-        typeof item.img !== "null" ?
-          <Thumbnail small source={item.img} />
+        item.img !== "empty" ?
+          <Thumbnail small source={{ uri: item.img}}  />
         :
-        
+          <UserAvatar
+            size="40"
+            name={item.name}
+            colors={['#000', '#140202', '#372B25', '#ccaabb']}
+          />
       }
-        
         <View
           style={{
             justifyContent: "flex-start",
@@ -66,7 +101,17 @@ class Comment extends Component {
             }}
           >
             <Text style={{ color: "gray", flex: 1 }}>
-              {item.text}
+              {
+                item.text.lenght > 200 ?
+                  item.text.substr(0, 200) + "..." + 
+                  <TouchableRipple>
+                    <Text style={{ color: 'red' }} >
+                      See more
+                    </Text>
+                  </TouchableRipple>
+                :
+                  item.text
+              }
             </Text>
           </View>
           <View
@@ -100,32 +145,22 @@ class Comment extends Component {
             </View>
             {
               this.props.user.user.id === item.userId &&
-                <View>
-                  <View style={styles.footerIcons}>
-                    <Button
-                      transparent
-                      dark
-                      onPress={this.handleCommentReply.bind(this)}
-                    >
-                      <Icon
-                        name="ios-create"
-                        style={{ fontSize: 20 }}
-                      />
-                    </Button>
-                  </View>
-
-                  <View style={styles.footerIcons}>
-                    <Button
-                      transparent
-                      dark
-                      onPress={this.handleCommentReply.bind(this)}
-                    >
-                      <Icon
-                        name="ios-close"
-                        style={{ fontSize: 20 }}
-                      />
-                    </Button>
-                  </View>
+                <View style={styles.footerIcons}>
+                  <IconButton
+                    icon="edit"
+                    size={20}
+                    onPress={this.handleDelete.bind(this, item.id)}
+                  />
+                </View>
+            }
+            {
+              this.props.user.user.id === item.userId &&
+                <View style={styles.footerIcons}>
+                  <IconButton
+                    icon="remove-circle"
+                    size={20}
+                    onPress={this.deleter.bind(this, item.id)}
+                  />
                 </View>
             }
           </View>

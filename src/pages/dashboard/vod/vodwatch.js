@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, FlatList, Platform, RefreshControl } from 'react-native';
 import Video, { Container } from 'react-native-af-video-player';
-import gone from '../../../assets/aqua.jpg';
-import { Spinner, Fab, Icon, Button, Thumbnail, Header, Body, Right, Left } from "native-base";
 import { Get } from '../../../components/reuse/get';
 import { setCurrentCommentId, passCurrentComentReplyObjectData } from "../../../store/actions/community";
 import { bindActionCreators } from 'redux';

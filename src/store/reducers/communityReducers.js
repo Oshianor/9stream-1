@@ -33,6 +33,10 @@ export default (state = initialstate, action) => {
       return Object.assign({}, state, {
         votingToggle: !state.votingToggle
       });
+    case "COMMENT_TEXT":
+      return Object.assign({}, state, {
+        commentText: action.payload,
+      });
     default:
       return state
   }

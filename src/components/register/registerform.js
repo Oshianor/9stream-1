@@ -175,7 +175,7 @@ class Registerform extends Component {
   componentDidUpdate(prevProps, prevState){
     if (prevState.country !== this.state.country) {
       if (this.state.index !== "") {
-        let code = this.props.data.countries[this.state.index === 0 ? this.state.index : this.state.index - 1]["alpha-2"];
+        let code = this.props.data.countries[this.state.index == 0 ? this.state.index : this.state.index - 1]["alpha-2"];
         this.setState({
           code
         })
@@ -192,6 +192,8 @@ class Registerform extends Component {
 
 
   onValueChange(value, index) {
+    console.log("COUNTRY INDEX", index);
+    
     this.setState({
       country: value,
       index

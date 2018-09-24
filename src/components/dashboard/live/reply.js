@@ -29,11 +29,9 @@ class Reply extends Component {
       })
     })
   }
-
   
-
-    // fetch the replys for a particaular comment
-  componentWillReceiveProps0(){
+  // fetch the replys for a particaular comment
+  componentWillReceiveProps(){
     if (this.props.community.commentId !== "") {
       this.setState({
         replyLoading: true
@@ -45,21 +43,6 @@ class Reply extends Component {
       })
     }
   }
-
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (prevState.commentId !== this.state.commentId) {
-  //     this.setState({
-  //       replyLoading: true
-  //     })
-  //     console.log('sammer');
-  //     Get('/api/getreplies/' + this.state.commentId).then((res) => {
-  //       this.setState({
-  //         reply: res, replyLoading: false
-  //       })
-  //     })
-  //   }
-  // }
-
 
   displaySingleComment = () => {
     const commentReply = this.props.community.commentReply;
@@ -81,7 +64,7 @@ class Reply extends Component {
               <Text
                 style={{ color: "#888", flex: 1, textAlign: 'right' }}
               >
-                {commentReply.created_at.toString()}
+                {commentReply.created.toString()}
               </Text>
             </View>
             <View
@@ -130,7 +113,8 @@ class Reply extends Component {
           </Body>
           <Right />
         </Header>
-        {this.state.replyLoading ? (
+        {
+        this.state.replyLoading ? (
           <View
             contentContainerStyle={{
               flex: 1,

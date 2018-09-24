@@ -1,27 +1,9 @@
 import React, { Component } from 'react';
 import Swiper from 'react-native-swiper';
-// import istock from "../../../assets/aqua.jpg";
-// import swap from "../../../assets/swapicon.png";
-// import nwa from "../../../assets/nwa.jpg";
-// import more from "../../../assets/more.jpg";
-import swap1 from "../../../assets/swap/1.jpg";
-import swap2 from "../../../assets/swap/2.jpg";
-import swap3 from "../../../assets/swap/3.jpg";
-import swap4 from "../../../assets/swap/4.jpg";
-import swap5 from "../../../assets/swap/5.jpg";
-import swap6 from "../../../assets/swap/6.jpg";
-import swap7 from "../../../assets/swap/7.jpg";
-import swap8 from "../../../assets/swap/8.jpg";
-import swap9 from "../../../assets/swap/9.jpg";
-import swap10 from "../../../assets/swap/10.jpg";
-import swap11 from "../../../assets/swap/11.jpg";
-import swap12 from "../../../assets/swap/12.jpg";
-import swap13 from "../../../assets/swap/13.jpg";
-import swap14 from "../../../assets/swap/14.jpg";
-import swap15 from "../../../assets/swap/15.jpg";
-import swap16 from "../../../assets/swap/16.jpg";
-import swap17 from "../../../assets/swap/17.jpg";
-import swap18 from "../../../assets/swap/18.jpg";
+import { Get } from "../../reuse/get";
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { xploreimages } from '../../../store/actions/data';
 
 import {
   Text,
@@ -34,71 +16,48 @@ import {
 const { width, height } = Dimensions.get('window');
 
 class Header extends Component {
+  componentDidMount(){
+    let empty = [];
+    Get("/resources/slider").then(res => {
+      if (!res.error) {
+        res.entries.forEach(ent => {
+          // console.log(ent.content[0].PosterF);
+          empty = empty.concat(ent.content[0].PosterF)
+        })
+        this.props.xploreimages(empty);
+      }
+    })
+  }
   render() {
     return (
       <View style={styles.container}>
         <Swiper style={styles.wrapper} height={height/2.5} horizontal={true} autoplay>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap1} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap2} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap3} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap4} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap5} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap6} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap7} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap8} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap9} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap10} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap11} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap12} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap13} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap14} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap15} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap16} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap17} />
-          </View>
-          <View style={styles.slide1}>
-            <Image resizeMode='stretch' style={styles.image} source={swap18} />
-          </View>
+          {
+            this.props.data.xploreImg.map((img, index) => (
+              <View key={index}  style={styles.slide1}>
+                <Image resizeMode='stretch' style={styles.image} source={{ uri: img }} />
+              </View>
+            ))
+          }
         </Swiper>
       </View>
     );
   }
 }
 
-export default Header;
+function mapStateToProps(state) {
+  return {
+    data: state.data
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    xploreimages: xploreimages
+  }, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);
 
 const styles = StyleSheet.create({
   paper: {

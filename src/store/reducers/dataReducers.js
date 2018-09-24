@@ -9,7 +9,8 @@ const initialstate = {
     xploreList: [],
     xploreVideo: '',
     xplorePoster: '',
-    xploreLoading: true
+    xploreLoading: true,
+    xploreImg: []
   }
   export default (state = initialstate, action) => {
     switch (action.type) {
@@ -58,6 +59,10 @@ const initialstate = {
         case "GET_XPLORE_LOADING":
             return Object.assign({}, state, {
                 xploreLoading: !state.xploreLoading
+            })
+        case "XPLORE_IMAGES":
+            return Object.assign({}, state, {
+                xploreImg: action.payload
             })
 
 

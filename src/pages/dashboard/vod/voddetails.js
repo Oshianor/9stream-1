@@ -9,10 +9,35 @@ import Rating from '../../../components/dashboard/vod/rating';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getUserObject } from '../../../store/actions/user';
+import Video from "react-native-af-video-player";
 
 class Voddetails extends Component {
+  // static navigationOptions = ({ navigation }) => {
+  //   return {
+  //     headerTitle: (
+  //       <View style={{ paddingLeft: 20 }} >
+  //         <Text style={{ color: '#FB8C00', fontSize: 20 }} >
+  //           {navigation.state.params.item.title}
+  //         </Text>
+  //       </View>
+  //     ),
+  //     headerStyle: {
+  //       backgroundColor: 'black'
+  //     },
+  //     headerTintColor: '#fff',
+  //     headerTitleStyle: {
+  //       fontWeight: 'bold',
+  //     },
+  //   }
+  // };
+
   static navigationOptions = ({ navigation }) => {
+    const { state } = navigation;
+    const header = state.params && (state.params.fullscreen ? undefined : null)
+    const tabBarVisible = state.params ? state.params.fullscreen : true
     return {
+      header,
+      tabBarVisible,
       headerTitle: (
         <View style={{ paddingLeft: 20 }} >
           <Text style={{ color: '#FB8C00', fontSize: 20 }} >
@@ -28,7 +53,7 @@ class Voddetails extends Component {
         fontWeight: 'bold',
       },
     }
-  };
+  }
 
   constructor(props) {
     super(props);
@@ -40,7 +65,8 @@ class Voddetails extends Component {
       visible: false,
       vid: null,
       img: null,
-      trailer: null
+      trailer: null,
+      video: false,
     }
   }
 
@@ -108,6 +134,13 @@ class Voddetails extends Component {
     })
   }
 
+  onFullScreen(status) {
+    // Set the params to pass in fullscreen status to navigationOptions
+    this.props.navigation.setParams({
+      fullscreen: !status
+    })
+  }
+
   sendError = () => {
     this.setState({
       text: 'Something Went Wrong.',
@@ -116,33 +149,37 @@ class Voddetails extends Component {
   }
 
   render() {
+    const theme = {
+      title: '#FFF',
+      more: '#446984',
+      center: '#7B8F99',
+      fullscreen: '#446984',
+      volume: '#A5957B',
+      scrubberThumb: '#234458',
+      scrubberBar: '#DBD5C7',
+      seconds: '#DBD5C7',
+      duration: '#DBD5C7',
+      progress: '#446984',
+      loading: '#DBD5C7'
+    }
+    const item = this.props.navigation.state.params.item;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }} >
         <ScrollView>
-          <TouchableOpacity onPress={this.handleVideo} >
-            {
-              this.props.navigation.state.params.item.content.map((img, index) => (
-                typeof img["PosterH"] !== "undefined" &&
-                  <ImageBackground
-                    key={index}
-                    source={{ uri: img["PosterH"] }}
-                    style={{ height: 250, justifyContent: 'center', alignItems: 'center' }}
-                  >
-                    <Icon
-                      name="ios-play"
-                      style={{
-                        fontSize: 70, justifyContent: 'center',
-                        color: 'gray'
-                      }}
-                    />
-                  </ImageBackground>
-              ))
-            }
-          </TouchableOpacity>
+           <Video
+            ref={(ref) => { this.video = ref }}
+            title={item.title}
+            url={this.state.trailer}
+            logo={item.img}
+            theme={theme}
+            onFullScreen={status => this.onFullScreen(status)}
+            fullScreenOnly
+            rotateToFullScreen
+          />
           <View style={{ justifyContent: 'center' }} >
-            <Button mode="outlined" color="orange" compact >Watch Trailer</Button>
+            <Button mode="outlined" color="orange" compact >Watch Full Movie</Button>
             <Text style={{ color: '#757575', padding: 5, marginTop: 10 }} >
-              {this.props.navigation.state.params.item.description}
+              {item.description}
             </Text>
 
             <View>
@@ -203,45 +240,27 @@ function mapDispatchToProps(dispatch) {
 export default connect(mapStateToProps, mapDispatchToProps)(Voddetails);
 
 // const styles = StyleSheet.create({
-//   container: {
-//     marginHorizontal: 10
-//   },
-//   buttonWithIcon: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//   },
-//   buttonText: {
-//     color: 'white'
-//   },
-//   iconDown: {
-//     marginLeft: 5
-//   },
-//   renderEpisodes: {
-//     marginTop: 10
-//   },
-//   image: {
-//     width: 150,
-//     height: 80,
-//     marginRight: 10
-//   },
-//   buttonPlay: {
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     flex: 1
-//   },
-//   episodeName: {
-//     justifyContent: 'center'
-//   },
-//   videoEpisode: {
-//     flexDirection: 'row'
-//   },
-//   text: {
-//     color: 'white'
-//   },
-//   summary: {
-//     color: 'grey',
-//     marginVertical: 10
-//   }
+
 // })
 
 
+{/* <TouchableOpacity onPress={this.handleVideo} >
+            {
+              this.props.navigation.state.params.item.content.map((img, index) => (
+                typeof img["PosterH"] !== "undefined" &&
+                  <ImageBackground
+                    key={index}
+                    source={{ uri: img["PosterH"] }}
+                    style={{ height: 250, justifyContent: 'center', alignItems: 'center' }}
+                  >
+                    <Icon
+                      name="ios-play"
+                      style={{
+                        fontSize: 70, justifyContent: 'center',
+                        color: 'gray'
+                      }}
+                    />
+                  </ImageBackground>
+              ))
+            }
+          </TouchableOpacity> */}

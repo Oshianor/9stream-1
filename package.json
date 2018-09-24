@@ -4,13 +4,15 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest"
+    "test": "jest",
+    "ios": "open ios/ninestream.xcworkspace"
   },
   "dependencies": {
     "native-base": "^2.8.0",
     "react": "16.5.0",
     "react-native": "0.57.0",
     "react-native-af-video-player": "^0.2.1",
+    "react-native-animatable": "^1.3.0",
     "react-native-autogrow-textinput": "^5.1.1",
     "react-native-countdown-component": "^1.7.3",
     "react-native-device-info": "^0.22.5",

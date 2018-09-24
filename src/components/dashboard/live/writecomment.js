@@ -5,14 +5,20 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { AutoGrowingTextInput } from 'react-native-autogrow-textinput';
 import { Icon } from 'native-base';
+import firebase from 'react-native-firebase';
 
 class WriteComment extends Component {
 
   render() {
     return (
       <View style={[styles.textInputContainer, {bottom: this.props.community.votingToggle ? 40 : 0}]}>
-        <TouchableOpacity>
-          <Text style={{ fontSize: 25 }} >😊</Text>
+        <TouchableOpacity
+          style={{ 
+            bottom: 6, 
+            position: 'absolute', 
+          }}
+        >
+          <Text style={{ fontSize: 25, color: "gray" }} >😊</Text>
         </TouchableOpacity>
         <AutoGrowingTextInput
           value={this.props.community.commentText}
@@ -44,8 +50,20 @@ class WriteComment extends Component {
   }
 
   sendReview = () => {
-    // this._textInput.clear();
-    this.props.handleReview();
+    
+    let database = firebase.database();
+    let newDataRef = database.ref("comments").push({});
+    let obj = {
+      id: newDataRef.key,
+      userId: this.props.user.user.id,
+      name: this.props.user.user.profile.firstName + " " + this.props.user.user.profile.lastName,
+      img: this.props.user.user.profile.avatar != null ? this.props.user.user.profile.avatar : "empty",
+      text: this.props.community.commentText,
+      created: database.getServerTime(),
+      updated: database.getServerTime()
+    }
+    database.ref("comments/" + newDataRef.key).update(obj);
+    this._textInput.clear();
     this._textInput.resetHeightToMin();
   }
 }
@@ -76,8 +94,10 @@ const styles = StyleSheet.create({
   },
   textInputContainer: {
     flexDirection: 'row',
+    zIndex: 999999,
     paddingLeft: 5,
-    paddingRight: 8
+    paddingRight: 8,
+    backgroundColor: "white"
   },
   welcome: {
     marginTop: 100,
@@ -87,6 +107,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     paddingLeft: 5,
+    marginLeft: 30,
     marginRight: 30,
     fontSize: 17,
     flex: 1,
@@ -98,7 +119,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     // alignItems: 'center',
     // justifyContent: 'center',
-    bottom: 0,
+    bottom: 2,
     // left: 0,
     right: 5,
     position: 'absolute'

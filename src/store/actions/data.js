@@ -86,3 +86,11 @@ export const refresh = (list) => {
     }
 }
 
+
+
+export const xploreimages = (list) => {
+    return {
+        type: "XPLORE_IMAGES",
+        payload: list
+    }
+}

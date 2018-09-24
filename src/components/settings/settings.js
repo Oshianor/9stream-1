@@ -89,7 +89,7 @@ class SettingComponent extends Component {
                   <UserAvatar
                     size="80"
                     name={this.props.user.user.profile.firstName + " " + this.props.user.user.profile.lastName}
-                    colors={['#000', '#fafafa', '#372B25', '#ccaabb']}
+                    colors={['#000', '#140202', '#372B25', '#ccaabb']}
                   />
                   <Icon name="ios-camera" onPress={this.selectPhotoTapped.bind(this)} style={{
                     width: 35,
@@ -104,6 +104,7 @@ class SettingComponent extends Component {
                   }}
                   />
                 </View>
+                // "https://sdtuts.com/wp-content/themes/sdtuts_2016/images/defaultavatar.png"
                 :
                 <Thumbnail
                   style={{ padding: 5, borderColor: "white" }}

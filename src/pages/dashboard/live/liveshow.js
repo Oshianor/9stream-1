@@ -12,6 +12,7 @@ import { Post } from "../../../components/reuse/post";
 import { Icon } from 'native-base';
 import Comment from '../../../components/dashboard/live/comment';
 import WriteComment from '../../../components/dashboard/live/writecomment';
+import * as Animatable from 'react-native-animatable';
 
 class LiveShow extends Component {
   static navigationOptions = ({ navigation }) => {
@@ -190,7 +191,7 @@ render() {
             <Spinner color="white" />
           </View>
           :
-          <Container>
+          <View style={{ flex: 1 }} >
             {
               this.state.video == null ?
               <TouchableOpacity onPress={this.initialLoad} >
@@ -215,26 +216,27 @@ render() {
                 title={this.state.video.title}
                 url={this.state.vid}
                 logo={this.state.img}
-                // placeholder={this.state.img}
                 theme={theme}
                 onFullScreen={status => this.onFullScreen(status)}
                 rotateToFullScreen
               />
             }
-        </Container>
+        </View>
       }
-      <View style={{ flex: 1, marginVertical: 20, backgroundColor: "white" }} >
+      <View style={{ flex: 1, backgroundColor: "white", marginTop: -140 }} >
         <Comment />
-      </View>
-      <WriteComment />
+        <WriteComment />
       {
         this.props.community.votingToggle &&
-        <Button mode="contained" 
-          style={{ borderRadius: 0, position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: "red" }}  >
-          VOTE
-        </Button>
+          <Animatable.View animation={this.props.community.votingToggle ? "fadeIn" : "fadeOut"} duration={2000}>
+            <Button mode="contained" 
+              style={{ borderRadius: 0, position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: "red" }}  
+            >
+              VOTE
+            </Button>
+          </Animatable.View>
       }
-      
+      </View>
       <Snackbar
         visible={this.state.visible}
         duration={9000000}
