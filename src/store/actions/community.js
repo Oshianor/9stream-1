@@ -29,8 +29,6 @@ export const getReply = (obj) => {
 
 
 export const commenttext = (obj) => {
-  console.log(obj);
-  
   return {
     type: "COMMENT_TEXT",
     payload: obj

@@ -49,6 +49,29 @@ class Comment extends Component {
     this.props.setCurrentCommentId(item.id);
   }
 
+  handleLikes(item){
+    let database = firebase.database();
+    if(database.hasChild("likes/" + item.id)){
+      // if it exist then remove it 
+      let database = firebase.database();
+      database.ref("comments").child(pas).remove();
+      // this.props.community.comment.forEach((com, index) => {
+      //   if (com.id == pas) {
+      //     this.props.community.comment.splice(index, 1)
+      //   }
+      // })
+    } else {
+      // if it doesnt exist den add
+      let newDataRef = database.ref("likes").push({});
+      let obj = {
+        id: newDataRef.key,
+        userId: this.props.user.user.id,
+        created: database.getServerTime(),
+      }
+      database.ref("comments/" + newDataRef.key).update(obj);
+    }
+  }
+
   deleter(pas){
     // delete comment
     let database = firebase.database();
@@ -62,23 +85,27 @@ class Comment extends Component {
   }
 
   async handleDelete(itemKey){
-    const { action } = await DialogAndroid.alert('Delete Comment', 
-    'Are You sure you want to perform this action?',
-    {
-      cancelable: true,
-      negativeColor: "red",
-      negativeText: "No",
-      positiveColor: "black",
-      positiveText: "Yes"
-    }
-  );
-    switch (action) {
-      case DialogAndroid.actionPositive:
-        this.deleter(itemKey)
-        break;
-      case DialogAndroid.actionNegative:
-        console.log('negative!')
-        break;
+    if (Platform.OS === "ios") {
+      this.deleter(itemKey);
+    } else {
+      const { action } = await DialogAndroid.alert('Delete Comment', 
+      'Are You sure you want to perform this action?',
+      {
+        cancelable: true,
+        negativeColor: "red",
+        negativeText: "No",
+        positiveColor: "black",
+        positiveText: "Yes"
+      }
+    );
+      switch (action) {
+        case DialogAndroid.actionPositive:
+          this.deleter(itemKey)
+          break;
+        case DialogAndroid.actionNegative:
+          console.log('negative!')
+          break;
+      }
     }
   }
 
@@ -147,22 +174,8 @@ class Comment extends Component {
                 <Text style={{ fontSize: 14 }}>34</Text>
               </Button>
             </View>
-
-            <View style={styles.footerIcons}>
-              <Button
-                transparent
-                dark
-                onPress={this.handleCommentReply.bind(this)}
-              >
-                <Icon
-                  name="ios-text-outline"
-                  style={{ fontSize: 20 }}
-                />
-                <Text style={{ fontSize: 14 }}>12</Text>
-              </Button>
-            </View>
             {
-              this.props.user.user.id === item.userId &&
+              this.props.user.user.id !== item.userId &&
                 <View style={styles.footerIcons}>
                   <IconButton
                     icon="edit"
@@ -172,10 +185,10 @@ class Comment extends Component {
                 </View>
             }
             {
-              this.props.user.user.id === item.userId &&
+              this.props.user.user.id !== item.userId &&
                 <View style={styles.footerIcons}>
                   <IconButton
-                    icon="remove-circle"
+                    icon="remove-circle-outline"
                     size={20}
                     onPress={this.handleDelete.bind(this, item.id)}
                   />
