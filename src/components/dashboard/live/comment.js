@@ -5,7 +5,8 @@ import { Icon, Button, Thumbnail, Container, Spinner } from "native-base";
 import { 
   setCurrentCommentId, 
   passCurrentComentReplyObjectData,
-  getcomment
+  getcomment,
+  commenttext
 } from "../../../store/actions/community";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -17,6 +18,11 @@ import DialogAndroid from 'react-native-dialogs';
 
 
 class Comment extends Component {
+
+  state = {
+    comment: [],
+    loading: true
+  }
   componentDidMount = () => {
     this._onRefresh();
   }
@@ -37,13 +43,25 @@ class Comment extends Component {
     this.props.passCurrentComentReplyObjectData(item);
   }
 
+  handleEditComment(item){
+    // edit comment
+    this.props.commenttext(item.text);
+    this.props.setCurrentCommentId(item.id);
+  }
+
   deleter(pas){
+    // delete comment
     let database = firebase.database();
-    database.ref("comments").child(pas).remove()
+    database.ref("comments").child(pas).remove();
+    this.props.community.comment.forEach((com, index) => {
+      if (com.id == pas) {
+        this.props.community.comment.splice(index, 1)
+      }
+    })
+    this.props.getcomment(this.props.community.comment);
   }
 
   async handleDelete(itemKey){
-    let database = firebase.database();
     const { action } = await DialogAndroid.alert('Delete Comment', 
     'Are You sure you want to perform this action?',
     {
@@ -56,7 +74,7 @@ class Comment extends Component {
   );
     switch (action) {
       case DialogAndroid.actionPositive:
-        database.ref("comments").child(itemKey).remove()
+        this.deleter(itemKey)
         break;
       case DialogAndroid.actionNegative:
         console.log('negative!')
@@ -102,8 +120,8 @@ class Comment extends Component {
           >
             <Text style={{ color: "gray", flex: 1 }}>
               {
-                item.text.lenght > 200 ?
-                  item.text.substr(0, 200) + "..." + 
+                item.text.lenght > 80 ?
+                  item.text.substr(0, 80) + "..." + 
                   <TouchableRipple>
                     <Text style={{ color: 'red' }} >
                       See more
@@ -149,7 +167,7 @@ class Comment extends Component {
                   <IconButton
                     icon="edit"
                     size={20}
-                    onPress={this.handleDelete.bind(this, item.id)}
+                    onPress={this.handleEditComment.bind(this, item)}
                   />
                 </View>
             }
@@ -159,7 +177,7 @@ class Comment extends Component {
                   <IconButton
                     icon="remove-circle"
                     size={20}
-                    onPress={this.deleter.bind(this, item.id)}
+                    onPress={this.handleDelete.bind(this, item.id)}
                   />
                 </View>
             }
@@ -168,10 +186,10 @@ class Comment extends Component {
       </View>
     );
   }
-
+// 07060769974
   render() {
     return (
-      <Container  style={{ flex: 1 }} >
+      <Container  style={{ flex: 1, marginBottom: 25 }} >
         {this.props.community.loading ? (
           <View
             contentContainerStyle={{
@@ -185,6 +203,7 @@ class Comment extends Component {
         ) : (
           <FlatList
             data={this.props.community.comment}
+            // data={this.state.comment}
             refreshControl={
               <RefreshControl
                 refreshing={this.props.community.refresh}
@@ -217,6 +236,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     setCurrentCommentId: setCurrentCommentId,
     getcomment: getcomment,
+    commenttext: commenttext,
     passCurrentComentReplyObjectData: passCurrentComentReplyObjectData
   }, dispatch)
 }

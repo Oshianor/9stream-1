@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
-import { commenttext, votingtoggle } from "../../../store/actions/community";
+import { StyleSheet, Keyboard, Text, View, TouchableOpacity, Platform } from 'react-native';
+import { commenttext, votingtoggle, setCurrentCommentId } from "../../../store/actions/community";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { AutoGrowingTextInput } from 'react-native-autogrow-textinput';
@@ -49,8 +49,18 @@ class WriteComment extends Component {
     this.props.commenttext(event.nativeEvent.text);
   }
 
-  sendReview = () => {
-    
+  handleEdit(){
+    let database = firebase.database();
+    database.ref('comments/' + this.props.community.commentId).update({
+      text: this.props.community.commentText,
+      updated: database.getServerTime()
+    });
+    this.props.setCurrentCommentId("");
+    this.props.commenttext("");
+    Keyboard.dismiss();
+  }
+
+  handleSend(){
     let database = firebase.database();
     let newDataRef = database.ref("comments").push({});
     let obj = {
@@ -63,9 +73,21 @@ class WriteComment extends Component {
       updated: database.getServerTime()
     }
     database.ref("comments/" + newDataRef.key).update(obj);
+    Keyboard.dismiss();
+    this.props.commenttext("");
     this._textInput.clear();
     this._textInput.resetHeightToMin();
   }
+
+  sendReview = () => {
+    if (this.props.community.commentId == "") {
+      this.handleSend();
+    } else {
+      this.handleEdit();
+    }
+  }
+
+
 }
 
 function mapStateToProps(state) {
@@ -78,7 +100,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     commenttext: commenttext,
-    votingtoggle: votingtoggle
+    votingtoggle: votingtoggle,
+    setCurrentCommentId: setCurrentCommentId
   }, dispatch)
 }
 

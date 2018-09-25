@@ -175,7 +175,7 @@ render() {
     progress: '#446984',
     loading: '#DBD5C7'
   }
-  console.log(this.state);
+  // console.log(this.state);
 
   return (
     <View style={styles.container}>
