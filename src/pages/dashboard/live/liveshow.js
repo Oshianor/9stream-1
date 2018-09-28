@@ -211,7 +211,6 @@ class LiveShow extends Component {
                     />
                   </ImageBackground>
                 </TouchableOpacity>
-                  
                 :
                 <Video
                   autoPlay
