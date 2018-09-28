@@ -41,7 +41,6 @@ class Content extends Component {
 
   _onRefresh = () => {
     this.props.refresh();
-    // let obj = { categories: "free" };
     let obj = {
       "sorted": "added",
       "filters": {

@@ -8,41 +8,6 @@ import { Icon } from 'native-base';
 import firebase from 'react-native-firebase';
 
 class WriteComment extends Component {
-
-  render() {
-    return (
-      <View style={[styles.textInputContainer, {bottom: this.props.community.votingToggle ? 40 : 0}]}>
-        <TouchableOpacity
-          style={{ 
-            bottom: 6, 
-            position: 'absolute', 
-          }}
-        >
-          <Text style={{ fontSize: 25, color: "gray" }} >😊</Text>
-        </TouchableOpacity>
-        <AutoGrowingTextInput
-          value={this.props.community.commentText}
-          onChange={(event) => this._onChange(event)}
-          style={styles.textInput}
-          placeholder={'What do you think?'}
-          placeholderTextColor='#66737C'
-          onFocus={() => this.props.votingtoggle()}
-          onBlur={() => this.props.votingtoggle()}
-          maxHeight={180}
-          minHeight={45}
-          enableScrollToCaret
-          ref={(r) => { this._textInput = r; }}
-        />
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={this.sendReview}
-        >
-          <Icon name="ios-send" style={{ fontSize: 40, color: "black" }} />
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
   _onChange(event) {
     // this.setState({ textValue: event.nativeEvent.text || '' });
     // this.props.setReview(event.nativeEvent.text);
@@ -86,8 +51,40 @@ class WriteComment extends Component {
       this.handleEdit();
     }
   }
-
-
+  
+  render() {
+    return (
+      <View style={[styles.textInputContainer, {bottom: this.props.community.votingToggle ? 40 : 0}]}>
+        <TouchableOpacity
+          style={{ 
+            bottom: 6, 
+            position: 'absolute', 
+          }}
+        >
+          <Text style={{ fontSize: 25, color: "gray" }} >😊</Text>
+        </TouchableOpacity>
+        <AutoGrowingTextInput
+          value={this.props.community.commentText}
+          onChange={(event) => this._onChange(event)}
+          style={styles.textInput}
+          placeholder={'What do you think?'}
+          placeholderTextColor='#66737C'
+          onFocus={() => this.props.votingtoggle()}
+          onBlur={() => this.props.votingtoggle()}
+          maxHeight={180}
+          minHeight={45}
+          enableScrollToCaret
+          ref={(r) => { this._textInput = r; }}
+        />
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={this.sendReview}
+        >
+          <Icon name="ios-send" style={{ fontSize: 40, color: "black" }} />
+        </TouchableOpacity>
+      </View>
+    );
+  }
 }
 
 function mapStateToProps(state) {

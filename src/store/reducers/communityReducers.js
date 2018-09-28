@@ -7,7 +7,9 @@ const initialstate = {
   loading: true,
   votingToggle: true,
   commentText: '',
-  replyText: ''
+  replyText: '',
+  celeb: [],
+  voting: false
 }
 export default (state = initialstate, action) => {
   switch (action.type) {
@@ -36,6 +38,14 @@ export default (state = initialstate, action) => {
     case "COMMENT_TEXT":
       return Object.assign({}, state, {
         commentText: action.payload,
+      });
+    case "CELEB":
+      return Object.assign({}, state, {
+        celeb: action.payload,
+      });
+    case "VOTING":
+      return Object.assign({}, state, {
+        voting: action.payload,
       });
     default:
       return state

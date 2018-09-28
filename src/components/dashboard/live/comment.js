@@ -16,13 +16,13 @@ import UserAvatar from 'react-native-user-avatar';
 import { TouchableRipple } from 'react-native-paper';
 import DialogAndroid from 'react-native-dialogs';
 
-
 class Comment extends Component {
 
   state = {
     comment: [],
     loading: true
   }
+
   componentDidMount = () => {
     this._onRefresh();
   }
@@ -175,7 +175,7 @@ class Comment extends Component {
               </Button>
             </View>
             {
-              this.props.user.user.id !== item.userId &&
+              this.props.user.user.id === item.userId &&
                 <View style={styles.footerIcons}>
                   <IconButton
                     icon="edit"
@@ -185,7 +185,7 @@ class Comment extends Component {
                 </View>
             }
             {
-              this.props.user.user.id !== item.userId &&
+              this.props.user.user.id === item.userId &&
                 <View style={styles.footerIcons}>
                   <IconButton
                     icon="remove-circle-outline"
@@ -199,7 +199,8 @@ class Comment extends Component {
       </View>
     );
   }
-// 07060769974
+  
+  
   render() {
     return (
       <Container  style={{ flex: 1, marginBottom: 25 }} >

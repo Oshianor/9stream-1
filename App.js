@@ -26,11 +26,11 @@ import XploreHome from './src/pages/dashboard/xplore/xplorehome.js';
 import XploreWatch from './src/pages/dashboard/xplore/xplorewatch';
 
 // live
-import LiveShowsList from './src/pages/dashboard/live/liveshowslist.js';
+// import LiveShowsList from './src/pages/dashboard/live/liveshowslist.js';
 import LiveShow from './src/pages/dashboard/live/liveshow.js';
-import Voting from './src/pages/dashboard/live/voting.js';
-import Input from './src/pages/dashboard/live/input.js';
-import Reply from './src/pages/dashboard/live/reply';
+// import Voting from './src/pages/dashboard/live/voting.js';
+// import Input from './src/pages/dashboard/live/input.js';
+// import Reply from './src/pages/dashboard/live/reply';
 
 import {
   Platform, StatusBar
@@ -101,9 +101,9 @@ const Screens = createStackNavigator({
       Live: createStackNavigator(
         {
           LiveShow: LiveShow,
-          Voting: Voting,
-          Input: Input,
-          Reply: Reply,
+          // Voting: Voting,
+          // Input: Input,
+          // Reply: Reply,
         },
         {
           initialRouteName: 'LiveShow',

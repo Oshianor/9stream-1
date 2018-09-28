@@ -8,6 +8,7 @@ import { StyleSheet, Image, ImageBackground, AsyncStorage, NetInfo, Dimensions, 
 import { Post } from '../../components/reuse/post'
 import { Get } from '../../components/reuse/get'
 import { getUserObject } from "../../store/actions/user";
+import { celeb } from "../../store/actions/community";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 const { width } = Dimensions.get('window');
@@ -56,8 +57,13 @@ class Home extends Component {
     try {
       const value = await AsyncStorage.getItem('user');
       const userRaw = await AsyncStorage.getItem('user_raw');
+      const celeb = await AsyncStorage.getItem('celeb');
       // console.log("LITTY", JSON.parse(value));
       // console.log("raw", JSON.parse(userRaw));
+      if (typeof JSON.parse(celeb) !== 'null') {
+        this.props.celeb(JSON.parse(celeb));
+      }
+
       this.setState({
         user: JSON.parse(value) === null ,
         userRaw: JSON.parse(userRaw)
@@ -191,7 +197,8 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    getUserObject: getUserObject
+    getUserObject: getUserObject,
+    celeb: celeb
   }, dispatch)
 }
 

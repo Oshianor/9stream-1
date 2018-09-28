@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Text, ImageBackground, NetInfo, TouchableOpacity, FlatList } from 'react-native';
 import { Spinner } from "native-base";
-import { Container } from 'react-native-af-video-player';
 import Video from "../../../components/dashboard/live/components/Video";
-import { setCurrentCommentId, passCurrentComentReplyObjectData } from "../../../store/actions/community";
+import { 
+  setCurrentCommentId, 
+  voting,
+  passCurrentComentReplyObjectData } from "../../../store/actions/community";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Button, Snackbar } from 'react-native-paper';
@@ -13,6 +15,7 @@ import { Icon } from 'native-base';
 import Comment from '../../../components/dashboard/live/comment';
 import WriteComment from '../../../components/dashboard/live/writecomment';
 import * as Animatable from 'react-native-animatable';
+import Voting from '../../../components/dashboard/live/voting';
 
 class LiveShow extends Component {
   static navigationOptions = ({ navigation }) => {
@@ -161,96 +164,101 @@ class LiveShow extends Component {
     this.initialLoad(); 
   }
 
-render() {
-  const theme = {
-    title: '#FFF',
-    more: '#446984',
-    center: '#7B8F99',
-    fullscreen: '#446984',
-    volume: '#A5957B',
-    scrubberThumb: '#234458',
-    scrubberBar: '#DBD5C7',
-    seconds: '#DBD5C7',
-    duration: '#DBD5C7',
-    progress: '#446984',
-    loading: '#DBD5C7'
-  }
-  // console.log(this.state);
+  render() {
+    const theme = {
+      title: '#FFF',
+      more: '#446984',
+      center: '#7B8F99',
+      fullscreen: '#446984',
+      volume: '#A5957B',
+      scrubberThumb: '#234458',
+      scrubberBar: '#DBD5C7',
+      seconds: '#DBD5C7',
+      duration: '#DBD5C7',
+      progress: '#446984',
+      loading: '#DBD5C7'
+    }
+    // console.log(this.state);
 
-  return (
-    <View style={styles.container}>
-      {
-        this.state.loading ?
-          <View
-            contentContainerStyle={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <Spinner color="white" />
-          </View>
-          :
-          <View style={{ flex: 1 }} >
-            {
-              this.state.video == null ?
-              <TouchableOpacity onPress={this.initialLoad} >
-                <ImageBackground
-                  source={{ uri: this.state.img }}
-                  style={{ height: 250, justifyContent: 'center', alignItems: 'center' }}
-                >
-                  <Icon
-                    name={"ios-" + this.state.icon}
-                    style={{
-                      fontSize: 70, justifyContent: 'center',
-                      color: 'gray'
-                    }}
-                  />
-                </ImageBackground>
-              </TouchableOpacity>
-                
-              :
-              <Video
-                autoPlay
-                ref={(ref) => { this.video = ref }}
-                title={this.state.video.title}
-                url={this.state.vid}
-                logo={this.state.img}
-                theme={theme}
-                onFullScreen={status => this.onFullScreen(status)}
-                rotateToFullScreen
-              />
-            }
-        </View>
-      }
-      <View style={{ flex: 1, backgroundColor: "white", marginTop: -140 }} >
-        <Comment />
-        <WriteComment />
-      {
-        this.props.community.votingToggle &&
-          <Animatable.View animation={this.props.community.votingToggle ? "fadeIn" : "fadeOut"} duration={2000}>
-            <Button mode="contained" 
-              style={{ borderRadius: 0, position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: "red" }}  
+    return (
+      <View style={styles.container}>
+        {
+          this.state.loading ?
+            <View
+              contentContainerStyle={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
             >
-              VOTE
-            </Button>
-          </Animatable.View>
-      }
+              <Spinner color="white" />
+            </View>
+            :
+            <View style={{ flex: 1 }} >
+              {
+                this.state.video == null ?
+                <TouchableOpacity onPress={this.initialLoad} >
+                  <ImageBackground
+                    source={{ uri: this.state.img }}
+                    style={{ height: 250, justifyContent: 'center', alignItems: 'center' }}
+                  >
+                    <Icon
+                      name={"ios-" + this.state.icon}
+                      style={{
+                        fontSize: 70, justifyContent: 'center',
+                        color: 'gray'
+                      }}
+                    />
+                  </ImageBackground>
+                </TouchableOpacity>
+                  
+                :
+                <Video
+                  autoPlay
+                  ref={(ref) => { this.video = ref }}
+                  title={this.state.video.title}
+                  url={this.state.vid}
+                  logo={this.state.img}
+                  theme={theme}
+                  onFullScreen={status => this.onFullScreen(status)}
+                  rotateToFullScreen
+                />
+              }
+          </View>
+        }
+        <View style={{ flex: 1, backgroundColor: "white", marginTop: -140 }} >
+          <Comment />
+          <WriteComment />
+        {
+          this.props.community.votingToggle &&
+            // <Animatable.View animation={this.props.community.votingToggle ? "fadeIn" : "fadeOut"} duration={2000}>
+              <Button 
+                onPress={() => this.props.voting(true)}
+                mode="contained" 
+                style={{ borderRadius: 0, position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: "red" }}  
+              >
+                VOTE
+              </Button>
+            // </Animatable.View>
+        }
+        </View>
+        <Voting 
+          userId={this.props.user.user._id} 
+        />
+        <Snackbar
+          visible={this.state.visible}
+          duration={9000000}
+          onDismiss={() => this.setState({ visible: false })}
+          action={{
+            label: 'Hide',
+            onPress: () => { this.setState({ visible: false }) },
+          }}
+        >
+          {this.state.text}
+        </Snackbar>
       </View>
-      <Snackbar
-        visible={this.state.visible}
-        duration={9000000}
-        onDismiss={() => this.setState({ visible: false })}
-        action={{
-          label: 'Hide',
-          onPress: () => { this.setState({ visible: false }) },
-        }}
-      >
-        {this.state.text}
-      </Snackbar>
-    </View>
-  )
-}
+    )
+  }
 }
 
 
@@ -264,6 +272,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     setCurrentCommentId: setCurrentCommentId,
+    voting: voting,
     passCurrentComentReplyObjectData: passCurrentComentReplyObjectData
   }, dispatch)
 }

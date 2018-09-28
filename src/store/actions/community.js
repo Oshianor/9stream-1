@@ -49,3 +49,22 @@ export const votingtoggle = () => {
     type: "VOTING_TOGGLE",
   }
 }
+
+
+export const celeb = (obj) => {
+  // list of celeb
+  return {
+    type: "CELEB",
+    payload: obj
+  }
+}
+
+
+
+export const voting = (obj) => {
+  // list of celeb
+  return {
+    type: "VOTING",
+    payload: obj
+  }
+}
