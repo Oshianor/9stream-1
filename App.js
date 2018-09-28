@@ -101,9 +101,6 @@ const Screens = createStackNavigator({
       Live: createStackNavigator(
         {
           LiveShow: LiveShow,
-          // Voting: Voting,
-          // Input: Input,
-          // Reply: Reply,
         },
         {
           initialRouteName: 'LiveShow',
@@ -138,7 +135,7 @@ const Screens = createStackNavigator({
         }
       ),
       },{
-        initialRouteName: 'Live',
+        initialRouteName: 'Vod',
         navigationOptions: ({ navigation, screenProps }) => ({
           swipeEnabled: navigation.state.index === 0,
           tabBarVisible: navigation.state.index === 0,

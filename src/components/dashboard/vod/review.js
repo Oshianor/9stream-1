@@ -3,35 +3,24 @@ import { Spinner, Thumbnail } from 'native-base';
 import { FlatList, RefreshControl, StyleSheet, Platform, View, Text } from 'react-native';
 import { Post } from '../../reuse/post';
 import gone from '../../../assets/aqua.jpg';
+import { Get } from '../../reuse/get';
+import UserAvatar from 'react-native-user-avatar';
 
 class Review extends Component {
   constructor(props) {
     super(props);
     
     this.state = {
-      review: [
-        {
-          firstName: "dub",
-          lastName: "for",
-          url: null,
-          created: new Date('12/12/2018'),
-          review: 'vghbjdhjnkgnkfn fnjfbnj '
-        },
-        {
-          firstName: "dub",
-          lastName: "for",
-          url: null,
-          created: new Date('12/12/2018'),
-          review: 'vghbjdhjnkgnkfn fnjfbnj '
-        },
-      ],
-      loading: true,
-      refreshing: true
+      review: [],
+      loading: false,
+      refreshing: false
     }
   }
   
   componentDidMount() {
-    Post('/review/list_by_reference', this.props.vodId).then(res => {
+    Get("review/list_by_reference?reference_id=" + this.props.vodId).then(res => {
+      console.log("review", res);
+      
       if (res.error === false) {
         this.setState({
           review: res.content,
@@ -50,7 +39,7 @@ class Review extends Component {
     this.setState({
       refreshing: true
     })
-    Post('/review/list_by_reference', this.props.vodId).then(res => {
+    Get('/review/list_by_reference', this.props.vodId).then(res => {
       if (res.error === false) {
         this.setState({
           review: res.content,
@@ -66,6 +55,8 @@ class Review extends Component {
   }
 
   render() {
+    console.log("VOD PROPS", this.props);
+    
     return (
       <View>
         {
@@ -94,7 +85,20 @@ class Review extends Component {
               keyExtractor={(item, index) => item + index}
               renderItem={({ item }) => (
                 <View style={styles.tweetReply} >
-                  <Thumbnail style={{ borderWidth: 1, borderColor: "white" }} small source={gone} />
+                  {
+                    item.userData[0].avatar == null ?
+                      <UserAvatar
+                        size="40"
+                        name={item.userData[0].firstName + " " + item.userData[0].lastName}
+                        colors={['#000', '#140202', '#372B25', '#ccaabb']}
+                      />
+                    :
+                      <Thumbnail 
+                        style={{ borderWidth: 1, borderColor: "white" }} 
+                        small 
+                        source={{ uri: item.userData[0].avatar }} 
+                      />
+                  }
                   <View
                     style={{
                       justifyContent: "flex-start",
@@ -106,13 +110,13 @@ class Review extends Component {
                   >
                     <View style={{ flexDirection: "row", maxHeight: 22 }}>
                       <Text>
-                        {item.firstName + " " + item.lastName}
+                        {item.userData[0].firstName + " " + item.userData[0].lastName}
                       </Text>
-                      {/* <Text
+                      <Text
                         style={{ color: "#888", flex: 1, textAlign: 'right' }}
                       >
-                        {item.created.toString()}
-                      </Text> */}
+                        {item.added.toString()}
+                      </Text>
                     </View>
                     <View
                       style={{

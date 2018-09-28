@@ -14,7 +14,6 @@ import { Post } from "../../../components/reuse/post";
 import { Icon } from 'native-base';
 import Comment from '../../../components/dashboard/live/comment';
 import WriteComment from '../../../components/dashboard/live/writecomment';
-import * as Animatable from 'react-native-animatable';
 import Voting from '../../../components/dashboard/live/voting';
 
 class LiveShow extends Component {
@@ -80,7 +79,6 @@ class LiveShow extends Component {
     try {
       const live = await AsyncStorage.getItem('live');
       if (typeof JSON.parse(live) !== 'null') {
-
         this.setState({
           video: JSON.parse(live),
           loading: false
@@ -108,7 +106,7 @@ class LiveShow extends Component {
       
       if (!resp.error) {
         // check if the user is subscribed
-        if (typeof resp.content.profile.subscriptionPlan !== "null") {
+        if (resp.content.profile.subscriptionPlan != null) {
           // if the user is subcribed then we get the live stream
           Get("/live/list_channels").then(res => {
             // cehck if there wer errors
@@ -135,6 +133,7 @@ class LiveShow extends Component {
             } else {
               // if there was an error in getting the channels
               this.setState({
+                video: null,
                 loading: false,
                 icon: "refresh"
               })
@@ -144,6 +143,7 @@ class LiveShow extends Component {
           // if there was an error in getting the channels
           this.setState({
             text: "Subscribe to get access to the swap show",
+            video: null,
             visible: true,
             loading: false,
             icon: "play"
@@ -231,15 +231,13 @@ class LiveShow extends Component {
           <WriteComment />
         {
           this.props.community.votingToggle &&
-            // <Animatable.View animation={this.props.community.votingToggle ? "fadeIn" : "fadeOut"} duration={2000}>
-              <Button 
-                onPress={() => this.props.voting(true)}
-                mode="contained" 
-                style={{ borderRadius: 0, position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: "red" }}  
-              >
-                VOTE
-              </Button>
-            // </Animatable.View>
+            <Button 
+              onPress={() => this.props.voting(true)}
+              mode="contained" 
+              style={{ borderRadius: 0, position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: "red" }}  
+            >
+              VOTE
+            </Button>
         }
         </View>
         <Voting 

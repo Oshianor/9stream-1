@@ -105,14 +105,14 @@ class Voddetails extends Component {
     const user = this.props.navigation.state.params.user;
     let obj = {
       token: user.token,
-      reference_id: 1,
+      reference_id: this.props.navigation.state.params.item._id,
       review: this.state.text
     }
-    console.log("ONNN",obj);
+    // console.log("ONNN",obj);
     
     if (this.state.review !== "") {
       Post('/review/save', obj).then(res => {
-        // console.log("REVIEW", res);
+        console.log("REVIEW", res);
         if (!res.error) {
           this.setState({
             text: 'Review Successfully Added.',
@@ -162,6 +162,7 @@ class Voddetails extends Component {
       progress: '#446984',
       loading: '#DBD5C7'
     }
+
     const item = this.props.navigation.state.params.item;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }} >
@@ -201,10 +202,10 @@ class Voddetails extends Component {
 
           {/* text field to write a review */}
           <WriteReview 
-          review={this.state.review} 
-          handleReview={this.handleReview.bind(this)}
-          setReview={this.setReview.bind(this)}
-        />
+            review={this.state.review} 
+            handleReview={this.handleReview.bind(this)}
+            setReview={this.setReview.bind(this)}
+          />
         </ScrollView>
         
         <Snackbar

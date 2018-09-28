@@ -33,9 +33,8 @@ class Rating extends Component {
   }
 
   componentDidMount() {
-    Get('/rating/list_by_reference/' + this.props.vodId).then(res => {
+    Get("/rating/list_by_reference?reference_id=" + this.props.vodId).then(res => {
       console.log("RAting", res);
-      
     })
   }
   
