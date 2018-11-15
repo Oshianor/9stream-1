@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Spinner, Thumbnail } from 'native-base';
 import { FlatList, RefreshControl, StyleSheet, Platform, View, Text } from 'react-native';
-import { Post } from '../../reuse/post';
-import gone from '../../../assets/aqua.jpg';
 import { Get } from '../../reuse/get';
 import UserAvatar from 'react-native-user-avatar';
+import PropTypes from 'prop-types';
+
 
 class Review extends Component {
   constructor(props) {
@@ -18,8 +18,9 @@ class Review extends Component {
   }
   
   componentDidMount() {
-    Get("review/list_by_reference?reference_id=" + this.props.vodId).then(res => {
-      console.log("review", res);
+    const { vodId, sendError } = this.props;
+    Get("review/list_by_reference?reference_id=" + vodId).then(res => {
+      // console.log("review", res);
       
       if (res.error === false) {
         this.setState({
@@ -30,16 +31,17 @@ class Review extends Component {
         this.setState({
           loading: false
         })
-        this.props.sendError();
+        sendError();
       }
     })
   }
   
   _onRefresh = () => {
+    const { vodId, sendError } = this.props;
     this.setState({
       refreshing: true
     })
-    Get('/review/list_by_reference', this.props.vodId).then(res => {
+    Get('/review/list_by_reference', vodId).then(res => {
       if (res.error === false) {
         this.setState({
           review: res.content,
@@ -49,18 +51,18 @@ class Review extends Component {
         this.setState({
           refreshing: false
         })
-        this.props.sendError();
+        sendError();
       }
     })
   }
 
   render() {
-    console.log("VOD PROPS", this.props);
-    
+    // console.log("VOD PROPS", this.props);
+    const { loading, refreshing, review } = this.state;
     return (
       <View>
         {
-          this.state.loading ?
+          loading ?
             <View
               contentContainerStyle={{
                 flex: 1,
@@ -72,10 +74,10 @@ class Review extends Component {
             </View>
           :
             <FlatList
-              data={this.state.review}
+              data={review}
               refreshControl={
                 <RefreshControl
-                  refreshing={this.state.refreshing}
+                  refreshing={refreshing}
                   onRefresh={this._onRefresh}
                   progressBackgroundColor="black"
                   enabled={true}
@@ -145,6 +147,11 @@ class Review extends Component {
   }
 }
 
+Review.propTypes = {
+  user: PropTypes.object.isRequired,
+  vodId: PropTypes.string.isRequired,
+  sendError: PropTypes.func.isRequired
+}
 export default Review;
 const styles = StyleSheet.create({
   elev: {

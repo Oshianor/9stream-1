@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
+import PropTypes from 'prop-types';
 import { withNavigation } from 'react-navigation';
 import { Thumbnail, Spinner, Picker, Container } from 'native-base';
 import { Post } from '../../../components/reuse/post';
@@ -60,18 +61,19 @@ class Vod extends Component {
   }
 
   _onRefresh = () => {
-    this.props.refresh();
+    const { refresh, getvodlistupdate } = this.props;
+    refresh();
     let obj = {
-      // "sorted": "added",
-      // "filters": {
-      //   "categories": "subscribers"
-      // }
+      "sorted": "added",
+      "filters": {
+        "categories": "subscribers"
+      }
     }
     Post('/tvod/list', obj).then((res) => {
       if (!res.error) {
-        this.props.getvodlistupdate(res.content.entries);
+        getvodlistupdate(res.content.entries);
       } else {
-        this.props.refresh();
+        refresh();
       }
     })
   }
@@ -87,29 +89,31 @@ class Vod extends Component {
 
   componentDidMount() {
     // get list of vod
+    const { selected } = this.state;
     this.getVodLists();
 
     this.props.navigation.setParams({
       onValueChange: this.onValueChange.bind(this)
     })
     this.props.navigation.setParams({
-      selected: this.state.selected
+      selected: selected
     })
   }
 
 
   getVodLists() {
+    const { getvodlist } = this.props;
     let obj = {
-      // "sorted": "added",
-      // "filters": {
-      //   "categories": "subscribers"
-      // }
+      "sorted": "added",
+      "filters": {
+        "categories": "subscribers"
+      }
     }
     Post('/tvod/list', obj).then((res) => {
-      console.log("LIST FILTERS", res);
+      // console.log("LIST FILTERS", res);
       if (!res.error) {
         if (typeof res.content.entries !== "undefined") {
-          this.props.getvodlist(res.content.entries);
+          getvodlist(res.content.entries);
         }
         if (res.content.entryCount == 0) {
           this.setState({
@@ -122,18 +126,20 @@ class Vod extends Component {
 
 
   render() {
-    if (this.state.noContent) {
+    const { noContent } = this.state;
+    const { data, user } = this.props;
+    if (noContent) {
       return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: "center", backgroundColor: '#242424' }} >
+        <View style={styles.add} >
           <Button mode="contained" disabled >
-            <Text style={{ color: "#f48221" }}> Currently No Content</Text>
+            <Text style={styles.colo}> Currently No Content</Text>
           </Button>
         </View>
       )
     }
     return (
       <Container  style={{ backgroundColor: '#242424' }}>
-          {this.props.data.vodLoading ? (
+          {data.vodLoading ? (
           <View
             contentContainerStyle={{
               flex: 1,
@@ -145,10 +151,10 @@ class Vod extends Component {
           </View>
         ) : (
           <FlatList
-            data={this.props.data.vodList}
+            data={data.vodList}
             refreshControl={
               <RefreshControl
-                refreshing={this.props.data.refreshing}
+                refreshing={data.refreshing}
                 onRefresh={this._onRefresh}
                 progressBackgroundColor="black"
                 enabled={true}
@@ -162,11 +168,11 @@ class Vod extends Component {
                 onPress={() => this.props.navigation.navigate('Voddetails', 
                   { 
                     item: item, 
-                    user: this.props.user.user 
+                    user: user.user 
                   }
                 )}
               >
-                <View style={{ flexDirection: 'row' }} >
+                <View style={styles.row} >
                   {
                     item.content.map((img, index) => (
                       typeof img["PosterH"] !== "undefined" &&
@@ -181,7 +187,7 @@ class Vod extends Component {
                       />
                     ))
                   }
-                  <View style={{ flexDirection: 'column' }} >
+                  <View style={styles.col} >
                     <Text style={styles.liveName} >{item.title}</Text>
                     <Text style={{ color: 'white', fontWeight: '200', paddingHorizontal: 5 }}>
                       {item.description.substr(0, 80) + ' ...'}
@@ -196,6 +202,12 @@ class Vod extends Component {
       </Container>
     );
   }
+}
+
+vod.propTypes = {
+  getvodlistupdate: PropTypes.func.isRequired,
+  refresh: PropTypes.func.isRequired,
+  getvodlist: PropTypes.func.isRequired
 }
 const styles = StyleSheet.create({
   container: {
@@ -223,7 +235,11 @@ const styles = StyleSheet.create({
     marginBottom: 5, 
     backgroundColor: '#414141',
     padding: 10
-  }
+  },
+  col: { flexDirection: 'column' },
+  row: { flexDirection: 'row' },
+  add: { flex: 1, justifyContent: 'center', alignItems: "center", backgroundColor: '#242424' },
+  colo: { color: "#f48221" }
 })
 
 const Vods = withNavigation(Vod);

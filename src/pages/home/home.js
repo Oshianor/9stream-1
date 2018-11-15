@@ -3,8 +3,7 @@ import {
   Container, Spinner
 } from 'native-base';
 import { Snackbar } from 'react-native-paper';
-import logo from '../../assets/streams.png';
-import { StyleSheet, Image, ImageBackground, AsyncStorage, NetInfo, Dimensions, View, Text } from 'react-native';
+import { StyleSheet, AsyncStorage, NetInfo, Dimensions, View, Text } from 'react-native';
 import { Post } from '../../components/reuse/post'
 import { Get } from '../../components/reuse/get'
 import { getUserObject } from "../../store/actions/user";
@@ -12,6 +11,7 @@ import { celeb } from "../../store/actions/community";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 const { width } = Dimensions.get('window');
+import PropTypes from 'prop-types';
 
 
 class Home extends Component {
@@ -53,15 +53,18 @@ class Home extends Component {
   };
 
   onLoad = async () => {
+    const { isConnected } = this.state;
+    const { getUserObject, celeb } = this.props;
+    // check for internet connectivity
     NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
     try {
       const value = await AsyncStorage.getItem('user');
       const userRaw = await AsyncStorage.getItem('user_raw');
-      const celeb = await AsyncStorage.getItem('celeb');
+      const celeber = await AsyncStorage.getItem('celeb');
       // console.log("LITTY", JSON.parse(value));
       // console.log("raw", JSON.parse(userRaw));
-      if (typeof JSON.parse(celeb) !== 'null') {
-        this.props.celeb(JSON.parse(celeb));
+      if (typeof JSON.parse(celeber) !== 'null') {
+        celeb(JSON.parse(celeber));
       }
 
       this.setState({
@@ -70,11 +73,11 @@ class Home extends Component {
       })
 
       // console.log(isConnected);
-      if (this.state.isConnected) {
+      if (isConnected) {
         // user has internet connection
         if (typeof JSON.parse(value) !== 'null') {
           // get app version
-          this.props.getUserObject(JSON.parse(value) !== null ? JSON.parse(value): {})
+          getUserObject(JSON.parse(value) !== null ? JSON.parse(value): {})
           Get('/mobile_config/get_app_version').then(res => {
             // console.log('MOBILE', res);
             
@@ -133,14 +136,16 @@ class Home extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.isConnected !== this.state.isConnected && this.state.isConnected) {
+    const { isConnected, user, userRaw } = this.state;
+    const { getUserObject } = this.props;
+    if (prevState.isConnected !== isConnected && isConnected) {
       // user has internet connection
       // console.log("here");
 
-      if (typeof this.state.user !== null) {
-        this.props.getUserObject(this.state.user)
+      if (typeof user !== null) {
+        getUserObject(user)
         // user has not logged in before
-        Post('/user/login_device', this.state.userRaw).then(res => {
+        Post('/user/login_device', userRaw).then(res => {
           // console.log("NEW DATA", res);
           if (res.error === false) {
             this.storeItem('user', res.content);
@@ -157,13 +162,13 @@ class Home extends Component {
   }
 
   render() {
-    console.log(this.state);
-
+    // console.log(this.state);
+    const { isConnected, text, visible } = this.state;
     return (
       <Container style={styles.root} >
         {/* <ImageBackground source={logo} style={styles.back} > */}
           {
-            !this.state.isConnected ?
+            !isConnected ?
               <View style={styles.offlineContainer}>
                 <Text style={styles.offlineText}>No Internet Connection</Text>
               </View>
@@ -174,19 +179,24 @@ class Home extends Component {
               />
           }
           <Snackbar
-            visible={this.state.visible}
+            visible={visible}
             onDismiss={() => this.setState({ visible: false })}
             action={{
               label: 'Hide',
               onPress: () => { this.setState({ visible: false }) },
             }}
           >
-            {this.state.text}
+            {text}
           </Snackbar>
         {/* </ImageBackground> */}
       </Container>
     );
   }
+}
+
+Verify.propTypes = {
+  getUserObject: PropTypes.func.isRequired,
+  celeb: PropTypes.func.isRequired
 }
 
 // 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, Dimensions, RefreshControl, TouchableOpacity, FlatList } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import { Spinner, Header, Body } from "native-base";
 import Video, { Container } from 'react-native-af-video-player';
 import { setCurrentCommentId, passCurrentComentReplyObjectData } from "../../../store/actions/community";
@@ -80,6 +80,9 @@ class LiveShow extends Component {
       progress: '#446984',
       loading: '#DBD5C7'
     }
+    const title = this.props.navigation.state.params.item.title;
+    const description = this.props.navigation.state.params.item.description;
+    const { vid, img } = this.state;
 
     return (
       <View style={styles.container}>
@@ -99,10 +102,10 @@ class LiveShow extends Component {
             <Video
               autoPlay
               ref={(ref) => { this.video = ref }}
-              title={this.props.navigation.state.params.item.title}
-              url={this.state.vid}
-              logo={this.state.img}
-              placeholder={this.state.img}
+              title={title}
+              url={vid}
+              logo={img}
+              placeholder={img}
               theme={theme}
               // onMorePress={() => this.onMorePress()}
               onFullScreen={status => this.onFullScreen(status)}
@@ -112,18 +115,18 @@ class LiveShow extends Component {
             <Header style={{ backgroundColor: "#f48221" }} >
               <Body>
                 <Text>
-                  {this.props.navigation.state.params.item.title}
+                  {title}
                 </Text>
               </Body>
             </Header>
-            <Text style={{ color: "gray", marginHorizontal: 5, marginVertical: 10 }} >
-              {this.props.navigation.state.params.item.description}
+            <Text style={styles.text} >
+              {description}
             </Text>
 
-            <View style={{ flex: 1, marginTop: 10 }} >
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: "center", backgroundColor: '#242424' }} >
+            <View style={styles.win} >
+              <View style={styles.sim} >
                 <Button mode="contained" disabled  >
-                  <Text style={{ color: "#f48221" }}>More related content</Text>
+                  <Text style={styles.col}>More related content</Text>
                 </Button>
               </View>
             </View>
@@ -158,6 +161,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black'
   },
+  sim: { flex: 1, justifyContent: 'center', alignItems: "center", backgroundColor: '#242424' },
+  win: { flex: 1, marginTop: 10 },
+  text: { color: "gray", marginHorizontal: 5, marginVertical: 10 },
+  col: { color: "#f48221" }
 });
 
 

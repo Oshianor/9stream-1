@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { View, ImageBackground, TouchableOpacity, Text, ScrollView } from 'react-native';
-import { Icon } from 'native-base';
+import { View, Text, ScrollView } from 'react-native';
 import WriteReview from '../../../components/dashboard/vod/writereview';
 import { Post } from '../../../components/reuse/post';
 import { Snackbar, Button } from 'react-native-paper';
@@ -12,25 +11,6 @@ import { getUserObject } from '../../../store/actions/user';
 import Video from "react-native-af-video-player";
 
 class Voddetails extends Component {
-  // static navigationOptions = ({ navigation }) => {
-  //   return {
-  //     headerTitle: (
-  //       <View style={{ paddingLeft: 20 }} >
-  //         <Text style={{ color: '#FB8C00', fontSize: 20 }} >
-  //           {navigation.state.params.item.title}
-  //         </Text>
-  //       </View>
-  //     ),
-  //     headerStyle: {
-  //       backgroundColor: 'black'
-  //     },
-  //     headerTintColor: '#fff',
-  //     headerTitleStyle: {
-  //       fontWeight: 'bold',
-  //     },
-  //   }
-  // };
-
   static navigationOptions = ({ navigation }) => {
     const { state } = navigation;
     const header = state.params && (state.params.fullscreen ? undefined : null)
@@ -103,14 +83,15 @@ class Voddetails extends Component {
   
   handleReview(){
     const user = this.props.navigation.state.params.user;
+    const { text, review } = this.state;
     let obj = {
       token: user.token,
       reference_id: this.props.navigation.state.params.item._id,
-      review: this.state.text
+      review: text
     }
     // console.log("ONNN",obj);
     
-    if (this.state.review !== "") {
+    if (review !== "") {
       Post('/review/save', obj).then(res => {
         console.log("REVIEW", res);
         if (!res.error) {
@@ -164,13 +145,14 @@ class Voddetails extends Component {
     }
 
     const item = this.props.navigation.state.params.item;
+    const { visible, duration, text, trailer, review } = this.state;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }} >
         <ScrollView>
            <Video
             ref={(ref) => { this.video = ref }}
             title={item.title}
-            url={this.state.trailer}
+            url={trailer}
             logo={item.img}
             theme={theme}
             onFullScreen={status => this.onFullScreen(status)}
@@ -189,7 +171,7 @@ class Voddetails extends Component {
                 vodId={this.props.navigation.state.params.item._id} 
                 sendError={this.sendError.bind(this)}
               />
-              <Text style={{ alignSelf: 'flex-start', fontWeight: '700', color: '#424242', padding: 5, fontSize: 15 }} >
+              <Text style={styles.tes} >
                 All Reviews
               </Text>
               <Review 
@@ -202,22 +184,22 @@ class Voddetails extends Component {
 
           {/* text field to write a review */}
           <WriteReview 
-            review={this.state.review} 
+            review={review} 
             handleReview={this.handleReview.bind(this)}
             setReview={this.setReview.bind(this)}
           />
         </ScrollView>
         
         <Snackbar
-          visible={this.state.visible}
+          visible={visible}
           onDismiss={() => this.setState({ visible: false })}
           action={{
             label: 'Hide',
             onPress: () => { this.setState({ visible: false }) },
           }}
-          duration={this.state.duration}
+          duration={duration}
         >
-          {this.state.text}
+          {text}
         </Snackbar>
       </View>
     );
@@ -239,29 +221,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Voddetails);
-
-// const styles = StyleSheet.create({
-
-// })
-
-
-{/* <TouchableOpacity onPress={this.handleVideo} >
-            {
-              this.props.navigation.state.params.item.content.map((img, index) => (
-                typeof img["PosterH"] !== "undefined" &&
-                  <ImageBackground
-                    key={index}
-                    source={{ uri: img["PosterH"] }}
-                    style={{ height: 250, justifyContent: 'center', alignItems: 'center' }}
-                  >
-                    <Icon
-                      name="ios-play"
-                      style={{
-                        fontSize: 70, justifyContent: 'center',
-                        color: 'gray'
-                      }}
-                    />
-                  </ImageBackground>
-              ))
-            }
-          </TouchableOpacity> */}
+const styles = StyleSheet.create({
+  tes: { alignSelf: 'flex-start', fontWeight: '700', color: '#424242', padding: 5, fontSize: 15 },
+})

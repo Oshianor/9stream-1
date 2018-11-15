@@ -16,7 +16,6 @@ class Register extends Component {
     this.state = {
       text: "",
       visible: false,
-      // duration: 20000,
     }
   }
 
@@ -28,6 +27,7 @@ class Register extends Component {
   }
 
   render() {
+    const { text, visible } = this.state;
     return (
       <ImageBackground source={back} style={classes.back} >
         <ScrollView>
@@ -48,15 +48,14 @@ class Register extends Component {
           </View>
         </ScrollView>
         <Snackbar
-          visible={this.state.visible}
-          // duration={this.state.duration}
+          visible={visible}
           onDismiss={() => this.setState({ visible: false })}
           action={{
             label: 'Hide',
             onPress: () => { this.setState({ visible: false }) },
           }}
         >
-          {this.state.text}
+          {text}
         </Snackbar>
       </ImageBackground>
     );

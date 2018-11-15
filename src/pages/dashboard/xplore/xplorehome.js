@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Container } from "native-base";
-import VideoPlayer from '../../../components/reuse/videoplayer';
 import Content from '../../../components/dashboard/xplore/content';
 import Header from '../../../components/dashboard/xplore/header';
+import { View, StyleSheet, Text } from 'react-native';
 
 class Xplore extends Component {
   static navigationOptions = {
@@ -11,15 +9,17 @@ class Xplore extends Component {
   };
   render() {
     return (
-      <View style={{ backgroundColor: 'black', flex: 1 }} >
+      <View style={styles.container} >
         <Header />
-        {/* <ScrollView style={{ backgroundColor: 'white', marginTop: 5 }} > */}
-          <Content />
-        {/* </ScrollView> */}
+        <Content />
       </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: { backgroundColor: 'black', flex: 1 }
+});
 
 export default Xplore;
 

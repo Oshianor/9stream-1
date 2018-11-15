@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
-
+import { StyleSheet, View, TouchableOpacity, Platform } from 'react-native';
 import { AutoGrowingTextInput } from 'react-native-autogrow-textinput';
 import { Icon } from 'native-base';
+import PropTypes from 'prop-types';
 
 export default class WriteReview extends Component {
   constructor(props) {
@@ -11,10 +11,11 @@ export default class WriteReview extends Component {
   }
 
   render() {
+    const { review } = this.props;
     return (
       <View style={styles.textInputContainer}>
         <AutoGrowingTextInput
-          value={this.props.review}
+          value={review}
           onChange={(event) => this._onChange(event)}
           style={styles.textInput}
           placeholder={'What do you think?'}
@@ -28,23 +29,32 @@ export default class WriteReview extends Component {
           style={styles.button} 
           onPress={this.sendReview}
         >
-          <Icon name="ios-send" style={{ fontSize: 40 }} />
+          <Icon name="ios-send" style={styles.ico} />
         </TouchableOpacity>
       </View>
     );
   }
 
   _onChange(event) {
+    const { setReview } = this.props;
     // this.setState({ textValue: event.nativeEvent.text || '' });
-    this.props.setReview(event.nativeEvent.text);
+    setReview(event.nativeEvent.text);
   }
 
   sendReview = () => {
+    const { handleReview } = this.props;
     // this._textInput.clear();
-    this.props.handleReview();
+    handleReview();
     this._textInput.resetHeightToMin();
   }
 }
+
+WriteReview.propTypes = {
+  user: PropTypes.func.isRequired,
+  handleReview: PropTypes.string.isRequired,
+  setReview: PropTypes.func.isRequired
+}
+
 
 const IsIOS = Platform.OS === 'ios';
 const styles = StyleSheet.create({
@@ -53,6 +63,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'red'
   },
+  ico: { fontSize: 40 },
   textInputContainer: {
     flexDirection: 'row',
     paddingLeft: 5,
@@ -83,3 +94,5 @@ const styles = StyleSheet.create({
     position: 'absolute'
   }
 });
+
+export default WriteReview; 

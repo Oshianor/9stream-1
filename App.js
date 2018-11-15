@@ -49,7 +49,6 @@ import Vodwatch from "./src/pages/dashboard/vod/vodwatch";
 import Verify from './src/pages/verify/verify';
 
 import { createStackNavigator } from 'react-navigation';
-// import { createDrawerNavigator, DrawerItems, SafeAreaView } from 'react-navigation';
 import { createMaterialTopTabNavigator } from 'react-navigation';
 import SplashScreen from 'react-native-splash-screen';
 

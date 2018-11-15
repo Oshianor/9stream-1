@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, View, Image, Platform, Text, Dimensions, NetInfo, ScrollView, ImageBackground, TouchableOpacity } from 'react-native';
 import stream from "../../assets/stream.png";
 import back from "../../assets/wall.png";
-import { Input, Icon, Item } from 'native-base';
+import PropTypes from 'prop-types';
 import { Post } from '../../components/reuse/post';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -81,31 +81,34 @@ class Verify extends Component {
 
 
   handleVerify = () => {
+    const { otp } = this.state;
+    const { getUserObject } = this.props;
+    const { email, password } = this.props.navigation.state.params;
     this.setState({
       loading: true
     })
     let emailer = this.props.navigation.state.params.email.toLowerCase();
     let obj = {
       email: emailer,
-      activation_code: this.state.otp
+      activation_code: otp
     }
 
     let load = {
-      username: this.props.navigation.state.params.email.toLowerCase(),
-      password: this.props.navigation.state.params.password,
+      username: email.toLowerCase(),
+      password: password,
       device_id: DeviceInfo.getUniqueID(),
       device_name: DeviceInfo.getModel()
     }
 
-    console.log("user_raw verify", load);
+    // console.log("user_raw verify", load);
 
     Post('/user/activate_account', obj).then((resp) => {
       if (resp.error == false) {
         Post('/user/login_device', load).then(res => {
-          console.log("VERIFY LOGIN", res);
+          // console.log("VERIFY LOGIN", res);
           if (!res.error) {
             this.storeItem('user', res.content);
-            this.props.getUserObject(res.content);
+            getUserObject(res.content);
             this.setState({
               loading: false
             })
@@ -145,15 +148,16 @@ class Verify extends Component {
   }
 
   render() {
-    console.log(this.state);
+    // console.log(this.state);
+    const { resend, isConnected, otp, loading } = this.state;
 
     let stan = {
-      color: this.state.resend ? 'gray' : 'orange'
+      color: resend ? 'gray' : 'orange'
     }
     return (
       <ImageBackground source={back} style={classes.back} >
         {
-        !this.state.isConnected &&
+        !isConnected &&
           <View style={styles.offlineContainer}>
             <Text style={styles.offlineText}>No Internet Connection</Text>
           </View>
@@ -168,14 +172,14 @@ class Verify extends Component {
               <Text style={classes.title} >Verify Your Phone Number</Text>
             </View>
             <View style={classes.form}>
-              <TouchableOpacity style={{ marginVertical: 5 }} onPress={this.handleOtpResend} >
+              <TouchableOpacity style={classes.mag} onPress={this.handleOtpResend} >
                 <Text style={stan}>Resend Code</Text>
               </TouchableOpacity>
               <Kohana
                 style={classes.input}
                 label={'Verification code'}
                 iconClass={Ionicons}
-                value={this.state.otp}
+                value={otp}
                 onChangeText={(otp) => this.setState({ otp })}
                 iconName={'ios-code-working'}
                 iconColor={'#f4d29a'}
@@ -188,7 +192,7 @@ class Verify extends Component {
                 inputStyle={{ color: 'white', fontSize: 15 }}
                 useNativeDriver
               />
-              <Button mode="contained" loading={this.state.loading} style={classes.button} onPress={this.handleVerify} >
+              <Button mode="contained" loading={loading} style={classes.button} onPress={this.handleVerify} >
                 VERIFY ACCOUNT
                 </Button>
             </View>
@@ -210,6 +214,9 @@ class Verify extends Component {
   }
 }
 
+Verify.propTypes = {
+  getUserObject: PropTypes.func.isRequired
+}
 // export default Verify;
 function mapStateToProps(state) {
   return {
@@ -232,6 +239,7 @@ const classes = StyleSheet.create({
     flex: 1,
     // backgroundColor: '#3498db',
   },
+  mag: { marginVertical: 5 },
   input: {
     height: 50,
     // backgroundColor: 'rgba(255,255,255,0.2)',

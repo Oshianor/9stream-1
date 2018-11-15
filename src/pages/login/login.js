@@ -27,6 +27,7 @@ class Login extends Component {
   }
 
   render() {
+    const { text, visible } = this.state;
     return (
       <ImageBackground source={back} style={classes.back} >
         <ScrollView>
@@ -47,14 +48,14 @@ class Login extends Component {
           </View>
         </ScrollView>
         <Snackbar
-          visible={this.state.visible}
+          visible={visible}
           onDismiss={() => this.setState({ visible: false })}
           action={{
             label: 'Hide',
             onPress: () => { this.setState({ visible: false }) },
           }}
         >
-          {this.state.text}
+          {text}
         </Snackbar>
       </ImageBackground>
     );
